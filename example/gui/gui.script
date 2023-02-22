@@ -1,0 +1,10 @@
+local dynatlas = require "dynamic-atlas.dynamic-atlas"
+
+function init(self)
+	go.property("example_atlas", resource.atlas("/example/gui/gui.atlas"))
+
+	dynatlas.pack(resource.get_atlas("/example/gui/gui.atlas"), {"/assets/images/image0.png"}, 1024, 1024)
+	
+	go.set("#gui", "textures", self.example_atlas, {key = "gui"})
+	msg.post("#gui", "resource_loaded", {"resource" = self.example_atlas})
+end

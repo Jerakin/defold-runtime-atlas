@@ -1,0 +1,12 @@
+local dynatlas = require "dynamic-atlas.dynamic-atlas"
+
+function init(self)
+	local atlas_id = dynatlas.pack("example", {"example/assets/images/image1.png", "example/assets/images/image2.png"}, 1024, 1024)
+	local atlas_data = resource.get_atlas(atlas_id)
+
+	timer.delay(1, false, function()
+		go.set("#sprite", "image", atlas_id)
+		sprite.play_flipbook("#sprite", "image1.png")
+	end)
+
+end

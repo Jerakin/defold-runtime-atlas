@@ -1,0 +1,14 @@
+function init(self)
+	-- Add initialization code here
+	-- Learn more: https://defold.com/manuals/script/
+	-- Remove this function if not needed
+end
+
+
+function on_message(self, message_id, message, sender)
+	if message_id == "resource_loaded" then
+		local node = gui.get_node("box")
+		gui.set_texture(node, "gui")
+		gui.play_flipbook(node, "image0")
+	end
+end
