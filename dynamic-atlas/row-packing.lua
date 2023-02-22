@@ -3,7 +3,7 @@ local M = {}
 
 
 local function height_sort(a, b)
-	return a.h < b.h
+	return a.h > b.h
 end
 
 function M.pack(list_of_textures, width, height)
@@ -43,6 +43,7 @@ function M.pack(list_of_textures, width, height)
 			largestHThisRow = rect.h;
 		end
 	end
+
 	return list_of_textures
 end
 

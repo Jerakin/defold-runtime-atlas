@@ -89,6 +89,13 @@ end
 
 
 local function get_atlas_parameters(image, atlas_params)
+	local indices =  {0,1,2,0,2,3}
+	-- Do we need to increment the indices?
+	--if atlas_params.geometries[#atlas_params.geometries] then
+	--	indices = atlas_params.geometries[#atlas_params.geometries].indices
+	--	indices = {indices[1]+3,indices[2]+3,indices[3]+3,indices[4]+3,indices[5]+3,indices[6]+3}
+	--end
+
 	table.insert(atlas_params.animations, {
 		id          = image.name,
 		width       = image.w,
@@ -109,17 +116,22 @@ local function get_atlas_parameters(image, atlas_params)
 			image.x + image.w, image.y + image.h,
 			image.x + image.w, image.y
 		},
-		indices = {0,1,2,0,2,3}
+		indices = indices
 	})
 	return atlas_params
 end
 
 function M.pack(atlas_name_or_resource, list_of_textures, width, height)
 	local pack_data = get_package_data(list_of_textures)
-	M.algorithm(pack_data, width, height)
-	pprint(pack_data)
+	local e = M.algorithm(pack_data, width, height)
+	if e == nil then
+		print("ERROR!")
+	end
+
+	-- These numbers I would have thought I could set to my desired atlas size
+	-- but the larger become the worse does the texture look
 	local atlas_creation_params = {
-		width  = 93,
+		width  = 134,
 		height = 78,
 		type   = resource.TEXTURE_TYPE_2D,
 		format = resource.TEXTURE_FORMAT_RGBA,
@@ -140,7 +152,7 @@ function M.pack(atlas_name_or_resource, list_of_textures, width, height)
 			
 			atlas_params = get_atlas_parameters(img, atlas_params)
 		end
-		pprint(atlas_params)
+		
 		atlas_id = resource.create_atlas(atlas_name .. "setc", atlas_params)
 		return atlas_id
 	else
