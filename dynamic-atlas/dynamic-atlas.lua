@@ -105,10 +105,10 @@ local function get_atlas_parameters(image, atlas_params)
 	})
 	table.insert(atlas_params.geometries, {
 		vertices  = {
-			image.x,   image.y,
-			image.x,   image.y + image.h,
-			image.x + image.w, image.y + image.h,
-			image.x + image.w, image.y
+			0,   0,
+			0,   image.h,
+			image.w, image.h,
+			image.w, 0
 		},
 		uvs = {
 			image.x,   image.y,
@@ -131,29 +131,26 @@ function M.pack(atlas_name_or_resource, list_of_textures, width, height)
 	-- These numbers I would have thought I could set to my desired atlas size
 	-- but the larger become the worse does the texture look
 	local atlas_creation_params = {
-		width  = 134,
-		height = 78,
+		width  = width,
+		height = height,
 		type   = resource.TEXTURE_TYPE_2D,
 		format = resource.TEXTURE_FORMAT_RGBA,
 	}
 	
 	if type(atlas_name_or_resource) == "string" then
 		local atlas_name = "/dynatlas/" .. atlas_name_or_resource .. ".texture"
-		local texture_id = resource.create_texture(atlas_name.."c", atlas_creation_params)
-		local atlas_id
+		local texture_id = resource.create_texture(atlas_name .."c", atlas_creation_params)
 		local set_params
-		local atlas_params = {animations={}, geometries={}}
-		atlas_params.texture = atlas_name.."c"
+		local atlas_params = {animations={}, geometries={}, texture = atlas_name .. "c"}
 		for i in pairs(pack_data) do
 			local img = pack_data[i]
-			
 			set_params = {width=img.w, height=img.h, x=img.x, y=img.y, type=resource.TEXTURE_TYPE_2D, format=resource.TEXTURE_FORMAT_RGBA}
 			resource.set_texture(texture_id, set_params, img.buffer)
 			
 			atlas_params = get_atlas_parameters(img, atlas_params)
 		end
 		
-		atlas_id = resource.create_atlas(atlas_name .. "setc", atlas_params)
+		local atlas_id = resource.create_atlas(atlas_name .. "setc", atlas_params)
 		return atlas_id
 	else
 		
