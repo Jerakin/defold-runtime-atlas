@@ -89,19 +89,12 @@ end
 
 
 local function get_atlas_parameters(image, atlas_params)
-	local indices =  {0,1,2,0,2,3}
-	-- Do we need to increment the indices?
-	--if atlas_params.geometries[#atlas_params.geometries] then
-	--	indices = atlas_params.geometries[#atlas_params.geometries].indices
-	--	indices = {indices[1]+3,indices[2]+3,indices[3]+3,indices[4]+3,indices[5]+3,indices[6]+3}
-	--end
-
 	table.insert(atlas_params.animations, {
 		id          = image.name,
 		width       = image.w,
 		height      = image.h,
-		frame_start = 1,
-		frame_end   = 2,
+		frame_start = #atlas_params.animations+1,
+		frame_end   = #atlas_params.animations+2,
 	})
 	table.insert(atlas_params.geometries, {
 		vertices  = {
@@ -116,10 +109,11 @@ local function get_atlas_parameters(image, atlas_params)
 			image.x + image.w, image.y + image.h,
 			image.x + image.w, image.y
 		},
-		indices = indices
+		indices = {0,1,2,0,2,3}
 	})
 	return atlas_params
 end
+
 
 function M.pack(atlas_name_or_resource, list_of_textures, width, height)
 	local pack_data = get_package_data(list_of_textures)
@@ -128,8 +122,6 @@ function M.pack(atlas_name_or_resource, list_of_textures, width, height)
 		print("ERROR!")
 	end
 
-	-- These numbers I would have thought I could set to my desired atlas size
-	-- but the larger become the worse does the texture look
 	local atlas_creation_params = {
 		width  = width,
 		height = height,
@@ -141,21 +133,54 @@ function M.pack(atlas_name_or_resource, list_of_textures, width, height)
 		local atlas_name = "/dynatlas/" .. atlas_name_or_resource .. ".texture"
 		local texture_id = resource.create_texture(atlas_name .."c", atlas_creation_params)
 		local set_params
-		local atlas_params = {animations={}, geometries={}, texture = atlas_name .. "c"}
+		local atlas_params = {animations={}, geometries={}, texture = texture_id}
+		
 		for i in pairs(pack_data) do
 			local img = pack_data[i]
-			set_params = {width=img.w, height=img.h, x=img.x, y=img.y, type=resource.TEXTURE_TYPE_2D, format=resource.TEXTURE_FORMAT_RGBA}
+			set_params = {width=img.w, height=img.h, x=img.x, y=height-img.h-img.y, type=resource.TEXTURE_TYPE_2D, format=resource.TEXTURE_FORMAT_RGBA}
 			resource.set_texture(texture_id, set_params, img.buffer)
-			
 			atlas_params = get_atlas_parameters(img, atlas_params)
 		end
 		
-		local atlas_id = resource.create_atlas(atlas_name .. "setc", atlas_params)
-		return atlas_id
+		return resource.create_atlas(atlas_name .. "setc", atlas_params)
 	else
 		
 	end	
 end
 
+function M.atlas_to_image(atlas_id, w, h, atlas_name)
+	local atlas_name = atlas_name or "debug"
+	local atlas_res = resource.get_atlas(atlas_id)
+	local atlas_data = {
+		texture = atlas_res.texture,
+		animations = {
+			{
+				id          = "atlas",
+				width       = w,
+				height      = h,
+				frame_start = 1,
+				frame_end   = 2
+			}
+		},
+		geometries = {
+			{
+				vertices = {
+					0, 0,
+					0, h,
+					w, h,
+					w, 0
+				},
+				uvs = {
+					0, 0,
+					0, h,
+					w, h,
+					w, 0
+				},
+				indices = {0,1,2,0,2,3}
+			}
+		}
+	}
+	return resource.create_atlas("/dynatlas/" .. atlas_name .. ".texturesetc", atlas_data)
+end
 
 return M

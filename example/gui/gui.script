@@ -5,6 +5,6 @@ function init(self)
 
 	dynatlas.pack(resource.get_atlas("/example/gui/gui.atlas"), {"/assets/images/image0.png"}, 1024, 1024)
 	
-	go.set("#gui", "textures", self.example_atlas, {key = "gui"})
-	msg.post("#gui", "resource_loaded", {"resource" = self.example_atlas})
+	--go.set("#gui", "textures", self.example_atlas, {key = "gui"})
+	--msg.post("#gui", "resource_loaded", {"resource" = self.example_atlas})
 end
