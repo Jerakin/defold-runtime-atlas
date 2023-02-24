@@ -1,7 +1,7 @@
 name: "default"
 collection_instances {
-  id: "go"
-  collection: "/example/go/go.collection"
+  id: "gui"
+  collection: "/example/gui/gui.collection"
   position {
     x: 0.0
     y: 0.0

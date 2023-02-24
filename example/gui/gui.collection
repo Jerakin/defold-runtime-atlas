@@ -21,7 +21,7 @@ embedded_instances {
   "}\n"
   "components {\n"
   "  id: \"go\"\n"
-  "  component: \"/example/go/go.script\"\n"
+  "  component: \"/example/gui/gui.script\"\n"
   "  position {\n"
   "    x: 0.0\n"
   "    y: 0.0\n"

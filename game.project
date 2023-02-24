@@ -15,3 +15,6 @@ input_method = HiddenInputField
 title = defold-dynamic-atlas
 custom_resources = /example/assets/images
 
+[library]
+include_dirs = /dynamic-atlas
+

@@ -1,10 +1,17 @@
 local dynatlas = require "dynamic-atlas.dynamic-atlas"
 
 function init(self)
-	go.property("example_atlas", resource.atlas("/example/gui/gui.atlas"))
+	--go.property("example_atlas", resource.atlas("/example/gui/gui.atlas"))
 
-	dynatlas.pack(resource.get_atlas("/example/gui/gui.atlas"), {"/assets/images/image0.png"}, 1024, 1024)
-	
-	--go.set("#gui", "textures", self.example_atlas, {key = "gui"})
-	--msg.post("#gui", "resource_loaded", {"resource" = self.example_atlas})
+	local atlas_entries = {
+		"example/assets/images/image0.png", "example/assets/images/image1.png", "example/assets/images/image2.png",
+		"example/assets/images/image3.png", "example/assets/images/image4.png", "example/assets/images/image5.png",
+		"example/assets/images/image6.png", "example/assets/images/image7.png", "example/assets/images/image8.png",
+		"example/assets/images/image9.png", "example/assets/images/image10.png", "example/assets/images/image11.png",
+		"example/assets/images/image12.png", "example/assets/images/image13.png"
+
+	}
+	local atlas_id = dynatlas.pack("example", atlas_entries, 256, 256)
+	go.set("#gui", "textures", atlas_id, {key = "example"})
+	msg.post("#gui", "resource_loaded", {texture = "example"})
 end
