@@ -2,12 +2,20 @@ function init(self)
 end
 
 function on_message(self, message_id, message, sender)
+
+	-- We listen for the message that we get from 'gui.script'
 	if message_id == hash("resource_loaded") then
 		local node = gui.get_node("box")
 
 		timer.delay(0.5, false, function()
+			
+			-- We change the texture of our node to the newly created,
+			-- using the name we passed in
 			gui.set_texture(node, message.texture)
-			gui.play_flipbook(node, "image0.png")
+
+			-- We can then pick one of our images and play the flipbook.
+			-- Buuut, this does not work https://github.com/defold/defold/issues/7423
+			-- gui.play_flipbook(node, "image0.png")
 		end)
 	end
 end

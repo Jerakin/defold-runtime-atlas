@@ -1,8 +1,6 @@
 local dynatlas = require "dynamic-atlas.dynamic-atlas"
 
 function init(self)
-	--go.property("example_atlas", resource.atlas("/example/gui/gui.atlas"))
-
 	local atlas_entries = {
 		"example/assets/images/image0.png", "example/assets/images/image1.png", "example/assets/images/image2.png",
 		"example/assets/images/image3.png", "example/assets/images/image4.png", "example/assets/images/image5.png",
@@ -11,7 +9,17 @@ function init(self)
 		"example/assets/images/image12.png", "example/assets/images/image13.png"
 
 	}
+	
+	-- We create our atlas with the given images
 	local atlas_id = dynatlas.pack("example", atlas_entries, 256, 256)
-	go.set("#gui", "textures", atlas_id, {key = "example"})
-	msg.post("#gui", "resource_loaded", {texture = "example"})
+
+	-- Setting the name in a variable and reusing that makes sure we won't mistype it
+	local name_of_our_new_texture_resource = "example"
+	
+	-- We add a texture named 'example' to our guis texture resources
+	go.set("#gui", "textures", atlas_id, {key = name_of_our_new_texture_resource})
+
+	-- Now we send a message to the gui script, telling it our initial setup is done,
+	-- we also pass in the name here of the texture for ease.
+	msg.post("#gui", "resource_loaded", {texture = name_of_our_new_texture_resource})
 end
