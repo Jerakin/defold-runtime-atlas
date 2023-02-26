@@ -1,6 +1,23 @@
+--[[
+
+You are able to reuse a texture that already exists in your project, here we are using the /example/gui_reuse/gui.atlas
+and putting our texture on that already existing image. HOWEVER the functionality to do this isn't that useful,
+you will first of have to make sure that the atlas you are reusing is big enough to fit your current Width and Height
+you will also have to type out its compiled name which isn't that readable.
+
+We will also have to make sure that the atlas is using the name we think (in this example 'gui').
+
+
+In the end I can not see a reason to do it this way. The _only_ benefit is that we don't have to 
+add another script file for our initial setup as we do in the 'created' workflow.
+
+--]]
+
 local dynatlas = require "dynamic-atlas.dynamic-atlas"
 
 function init(self)
+	local node = gui.get_node("box")
+	
 	local atlas_entries = {
 		"example/assets/images/image0.png", "example/assets/images/image1.png", "example/assets/images/image2.png",
 		"example/assets/images/image3.png", "example/assets/images/image4.png", "example/assets/images/image5.png",
@@ -12,10 +29,13 @@ function init(self)
 
 	-- We create our atlas with the given images
 	local atlas_id = dynatlas.pack("/example/gui_reuse/gui.a.texturesetc", atlas_entries, 256, 256)
-	local node = gui.get_node("box")
+
+	-- We have to set it to the resource we update our gui for
 	gui.set_texture(node, "gui")
-	gui.play_flipbook(node, "image0.png")
 	
+	-- We can then pick one of our images and play the flipbook.
+	-- Buuut, this does not work https://github.com/defold/defold/issues/7423
+	gui.play_flipbook(node, "image0.png")
 end
 
 function on_message(self, message_id, message, sender)
