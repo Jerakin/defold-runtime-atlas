@@ -1,9 +1,12 @@
+--
+
 local rowpacking = require "dynamic-atlas/row-packing"
 
 local M  = {}
 
 M.algorithm = rowpacking.pack
 
+-- Loading images on disk loads the buffers as strings, here we convert them into defolds buffer format
 local function convert_string_buffer_to_buffer(blob)
 	-- string with binary pixel data in rgba format
 	local size = #blob / 4
@@ -30,6 +33,8 @@ local function convert_string_buffer_to_buffer(blob)
 	return new_buffer
 end
 
+-- After loading the images they are flipped vertically. This makes sure they are not upside down.
+-- TODO: Maybe we can flip the texture as we are converting the buffer
 local function flip_texture_vertically(buffer_string, outw, outh, bytes_per_pixel)
 	local pixels = {}
 	buffer_string:gsub(".",function(c) table.insert(pixels,c) end)
@@ -52,6 +57,14 @@ local function flip_texture_vertically(buffer_string, outw, outh, bytes_per_pixe
 	return table.concat(pixels, "")
 end
 
+
+-- String end_swith
+local function ends_with(str, ending)
+	return ending == "" or str:sub(-#ending) == ending
+end
+
+
+-- String split
 local function split(inputstr, sep)
 	if sep == nil then
 		sep = "%s"
@@ -64,17 +77,14 @@ local function split(inputstr, sep)
 end
 
 
---This function finds the filename when given a complete path 
+-- Get the filename (image.png) when given a complete path 
 function get_filename(path)
 	local parts = split(path, "/")
 	return parts[#parts]
 end
 
-local function ends_with(str, ending)
-	return ending == "" or str:sub(-#ending) == ending
-end
-
-
+-- Loads all images into memory and saves some additional data needed for packing.
+-- We need to load the images to get the width and height of them, for our packing algorithm.
 local function get_package_data(list_of_textures)
 	local pack_data = {}
 	for i in pairs(list_of_textures or {}) do
@@ -97,6 +107,7 @@ local function get_atlas_parameters(image, atlas_params)
 		id          = image.name,
 		width       = image.w,
 		height      = image.h,
+		-- We have to increase the frame range, this is what decided which geometies belong to this id
 		frame_start = #atlas_params.animations+1,
 		frame_end   = #atlas_params.animations+2,
 	})
@@ -108,11 +119,14 @@ local function get_atlas_parameters(image, atlas_params)
 			image.w, 0
 		},
 		uvs = {
+			-- The UVs are in texture space so we have to make sure to update it to take our position on
+			-- the atlas into account.
 			image.x,   image.y,
 			image.x,   image.y + image.h,
 			image.x + image.w, image.y + image.h,
 			image.x + image.w, image.y
 		},
+		-- We are adding our images as rectangles so we don't have to touch the indices
 		indices = {0,1,2,0,2,3}
 	})
 	return atlas_params
@@ -125,14 +139,31 @@ local function create_texture(texture_id, pack_data, height)
 
 	for i in pairs(pack_data) do
 		local img = pack_data[i]
-		set_params = {width=img.w, height=img.h, x=img.x, y=height-img.h-img.y, type=resource.TEXTURE_TYPE_2D, format=resource.TEXTURE_FORMAT_RGBA}
+		set_params = {
+			width=img.w,
+			height=img.h,
+			x=img.x,
+			-- 0, 0 for an atlas is top left, that means we need to convert the y 
+			-- to make sure it is inserted at the correct place
+			y=height-img.h-img.y,
+			type=resource.TEXTURE_TYPE_2D,
+			format=resource.TEXTURE_FORMAT_RGBA
+		}
+		
 		resource.set_texture(texture_id, set_params, img.buffer)
 		atlas_params = get_atlas_parameters(img, atlas_params)
 	end
 	return atlas_params
 end
 
-function M.pack(atlas_name_or_resource, list_of_textures, width, height)
+
+--- Pack a list of images into a atlas
+-- @param atlas_name_or_path either name of your dynamic atlas or path to an 
+-- existing atlas that will be over reused and over written.
+-- @param list_of_textures Table image paths
+-- @param width Atlas width
+-- @param height Atlas height
+function M.pack(atlas_name_or_path, list_of_textures, width, height)
 	local pack_data = get_package_data(list_of_textures)
 	local e = M.algorithm(pack_data, width, height)
 	if e == nil then
@@ -145,23 +176,25 @@ function M.pack(atlas_name_or_resource, list_of_textures, width, height)
 		type   = resource.TEXTURE_TYPE_2D,
 		format = resource.TEXTURE_FORMAT_RGBA,
 	}
-	
-	if not ends_with(atlas_name_or_resource, ".texturesetc") then
-		local atlas_name = "/dynatlas/" .. atlas_name_or_resource .. ".texture"
+
+	if not ends_with(atlas_name_or_path, ".texturesetc") then
+		local atlas_name = "/dynatlas/" .. atlas_name_or_path .. ".texture"
 		local texture_id = resource.create_texture(atlas_name .."c", atlas_creation_params)
 		local atlas_params = create_texture(texture_id, pack_data, height)
 		
 		return resource.create_atlas(atlas_name .. "setc", atlas_params)
 	else
-		local texture_id = resource.get_atlas(atlas_name_or_resource).texture
+		local texture_id = resource.get_atlas(atlas_name_or_path).texture
 
 		local atlas_params = create_texture(texture_id, pack_data, height)
-		resource.set_atlas(atlas_name_or_resource, atlas_params)
+		resource.set_atlas(atlas_name_or_path, atlas_params)
 		return 
 	end	
 end
 
-function M.atlas_to_image(atlas_id, w, h, atlas_name)
+-- Debug function, creates a new atlas from an existing texture. This is used to view
+-- to whole atlas with play_flipbook
+function M._atlas_to_image(atlas_id, w, h, atlas_name)
 	local atlas_name = atlas_name or "debug"
 	local atlas_res = resource.get_atlas(atlas_id)
 	local atlas_data = {

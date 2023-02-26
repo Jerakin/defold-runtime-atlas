@@ -1,11 +1,24 @@
+-- Naive atlas packing algorithm to serve as an example, mainly serving
+-- as an example of an algorithm you can use with dynamic-atlas.lua
+-- Algorithms expects a table of images where an image is a table that
+-- have w and h {w=64, h=32}, representing widht and height respectivly.
+--
+-- The algoritms jobb is to loop through the list of images and add x and y
+-- which are the positions on the atlas.
+--
+-- Adopted from this article https://www.david-colson.com/2020/03/10/exploring-rect-packing.html
+
 local M = {}
-
-
 
 local function height_sort(a, b)
 	return a.h > b.h
 end
 
+
+--- Algorithm that packs adds positions (x, y) to a Image table
+-- @param list_of_textures Table of an Image table with a minimum of w and h
+-- @param width Width of the atlas it will be packed on
+-- @param height Height of the atlas it will be packed on
 function M.pack(list_of_textures, width, height)
 	assert(width, "Provide texture width")
 	assert(height, "Provide texture height")
