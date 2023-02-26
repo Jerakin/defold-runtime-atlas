@@ -17,7 +17,7 @@ You only need to supply a list of images as well as width and height to `dynatla
 
 ```lua
 local atlas_entries = {
-	"example/assets/images/image0.png", "example/assets/images/image1.png
+	"example/assets/images/image0.png", "example/assets/images/image1.png"
 }
 
 local atlas_id = dynatlas.pack("example", atlas_entries, 256, 256)
