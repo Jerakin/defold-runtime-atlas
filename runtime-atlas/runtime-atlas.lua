@@ -1,9 +1,8 @@
---
-
-local rowpacking = require "dynamic-atlas/row-packing"
+local rowpacking = require "runtime-atlas/row-packing"
 
 local M  = {}
 
+-- You can provide your own packing algorithm and set it with this property.
 M.algorithm = rowpacking.pack
 
 -- Loading images on disk loads the buffers as strings, here we convert them into defolds buffer format
@@ -132,8 +131,9 @@ local function get_atlas_parameters(image, atlas_params)
 	return atlas_params
 end
 
-
-local function create_texture(texture_id, pack_data, height)
+-- Here we set the buffer data onto the actual texture as well as calculate the data needed for
+-- our atlas to map the frames and ids to a position on the texture.
+local function set_texture_data(texture_id, pack_data, height)
 	local set_params
 	local atlas_params = {animations={}, geometries={}, texture = texture_id}
 
@@ -180,13 +180,13 @@ function M.pack(atlas_name_or_path, list_of_textures, width, height)
 	if not ends_with(atlas_name_or_path, ".texturesetc") then
 		local atlas_name = "/dynatlas/" .. atlas_name_or_path .. ".texture"
 		local texture_id = resource.create_texture(atlas_name .."c", atlas_creation_params)
-		local atlas_params = create_texture(texture_id, pack_data, height)
+		local atlas_params = set_texture_data(texture_id, pack_data, height)
 		
 		return resource.create_atlas(atlas_name .. "setc", atlas_params)
 	else
 		local texture_id = resource.get_atlas(atlas_name_or_path).texture
 
-		local atlas_params = create_texture(texture_id, pack_data, height)
+		local atlas_params = set_texture_data(texture_id, pack_data, height)
 		resource.set_atlas(atlas_name_or_path, atlas_params)
 		return 
 	end	

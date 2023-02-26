@@ -1,4 +1,4 @@
-local dynatlas = require "dynamic-atlas.dynamic-atlas"
+local rtatlas = require "runtime-atlas.runtime-atlas"
 
 
 function init(self)
@@ -10,7 +10,7 @@ function init(self)
 		"example/assets/images/image12.png", "example/assets/images/image13.png"
 		
 	}
-	local atlas_id = dynatlas.pack("example", atlas_entries, 256, 256)
+	local atlas_id = rtatlas.pack("example", atlas_entries, 256, 256)
 	local i = 1
 
 	timer.delay(0.5, true, function()
@@ -19,7 +19,7 @@ function init(self)
 		i = (i + 1) % #atlas_entries
 	end)
 
-	local debug_resource = dynatlas._atlas_to_image(atlas_id, 256, 256)
+	local debug_resource = rtatlas._atlas_to_image(atlas_id, 256, 256)
 	go.set("#sprite1", "image", debug_resource)
 	sprite.play_flipbook("#sprite1", "atlas")
 end

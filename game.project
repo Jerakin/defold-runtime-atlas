@@ -12,7 +12,7 @@ height = 640
 input_method = HiddenInputField
 
 [project]
-title = defold-dynamic-atlas
+title = defold-runtime-atlas
 custom_resources = /example/assets/images
 
 [library]
