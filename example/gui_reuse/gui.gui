@@ -1,4 +1,8 @@
-script: "/example/gui_created/gui.gui_script"
+script: "/example/gui_reuse/gui.gui_script"
+textures {
+  name: "gui"
+  texture: "/example/gui_reuse/gui.atlas"
+}
 background_color {
   x: 0.0
   y: 0.0

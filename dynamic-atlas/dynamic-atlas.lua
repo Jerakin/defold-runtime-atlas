@@ -70,6 +70,10 @@ function get_filename(path)
 	return parts[#parts]
 end
 
+local function ends_with(str, ending)
+	return ending == "" or str:sub(-#ending) == ending
+end
+
 
 local function get_package_data(list_of_textures)
 	local pack_data = {}
@@ -115,6 +119,19 @@ local function get_atlas_parameters(image, atlas_params)
 end
 
 
+local function create_texture(texture_id, pack_data, height)
+	local set_params
+	local atlas_params = {animations={}, geometries={}, texture = texture_id}
+
+	for i in pairs(pack_data) do
+		local img = pack_data[i]
+		set_params = {width=img.w, height=img.h, x=img.x, y=height-img.h-img.y, type=resource.TEXTURE_TYPE_2D, format=resource.TEXTURE_FORMAT_RGBA}
+		resource.set_texture(texture_id, set_params, img.buffer)
+		atlas_params = get_atlas_parameters(img, atlas_params)
+	end
+	return atlas_params
+end
+
 function M.pack(atlas_name_or_resource, list_of_textures, width, height)
 	local pack_data = get_package_data(list_of_textures)
 	local e = M.algorithm(pack_data, width, height)
@@ -129,22 +146,18 @@ function M.pack(atlas_name_or_resource, list_of_textures, width, height)
 		format = resource.TEXTURE_FORMAT_RGBA,
 	}
 	
-	if type(atlas_name_or_resource) == "string" then
+	if not ends_with(atlas_name_or_resource, ".texturesetc") then
 		local atlas_name = "/dynatlas/" .. atlas_name_or_resource .. ".texture"
 		local texture_id = resource.create_texture(atlas_name .."c", atlas_creation_params)
-		local set_params
-		local atlas_params = {animations={}, geometries={}, texture = texture_id}
-		
-		for i in pairs(pack_data) do
-			local img = pack_data[i]
-			set_params = {width=img.w, height=img.h, x=img.x, y=height-img.h-img.y, type=resource.TEXTURE_TYPE_2D, format=resource.TEXTURE_FORMAT_RGBA}
-			resource.set_texture(texture_id, set_params, img.buffer)
-			atlas_params = get_atlas_parameters(img, atlas_params)
-		end
+		local atlas_params = create_texture(texture_id, pack_data, height)
 		
 		return resource.create_atlas(atlas_name .. "setc", atlas_params)
 	else
-		
+		local texture_id = resource.get_atlas(atlas_name_or_resource).texture
+
+		local atlas_params = create_texture(texture_id, pack_data, height)
+		resource.set_atlas(atlas_name_or_resource, atlas_params)
+		return 
 	end	
 end
 
