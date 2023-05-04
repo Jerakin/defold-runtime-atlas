@@ -2,9 +2,6 @@
 
 This serves as both an exampel and a library to help you create atlases at runtime.
 
-> WARNING! You can not use this functionallity in GUI yet. It has been reported to Defold https://github.com/defold/defold/issues/7423
-
-
 ## Installation
 You can use the runtime atlas in your own project by adding this project as a [Defold library dependency](http://www.defold.com/manuals/libraries/). Open your game.project file and in the dependencies field under project add:
 

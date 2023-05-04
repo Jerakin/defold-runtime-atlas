@@ -10,6 +10,7 @@ function init(self)
 		"example/assets/images/image12.png", "example/assets/images/image13.png"
 		
 	}
+	-- Pack our atlas onto an atlas, you have to manually make sure it fits
 	local atlas_id = rtatlas.pack("example", atlas_entries, 256, 256)
 	local i = 1
 

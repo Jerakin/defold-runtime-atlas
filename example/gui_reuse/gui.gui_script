@@ -29,14 +29,19 @@ function init(self)
 	}
 
 	-- We create our atlas with the given images
-	local atlas_id = rtatlas.pack("/example/gui_reuse/gui.a.texturesetc", atlas_entries, 256, 256)
+	local atlas_id = rtatlas.pack("/example/gui_reuse/gui.a.texturesetc", atlas_entries, 512, 512)
 
 	-- We have to set it to the resource we update our gui for
 	gui.set_texture(node, "gui")
 	
-	-- We can then pick one of our images and play the flipbook.
-	-- Buuut, this does not work https://github.com/defold/defold/issues/7423
-	gui.play_flipbook(node, "image0.png")
+	-- We can then pick one of our images and play the flipbook. 
+	-- We start a loop to visualise that it actually works
+	local i = 1
+	gui.play_flipbook(node, "image" .. tostring(i) .. ".png")
+	timer.delay(0.5, true, function()
+		i = (i + 1) % #atlas_entries
+		gui.play_flipbook(node, "image" .. tostring(i) .. ".png")
+	end)
 end
 
 function on_message(self, message_id, message, sender)

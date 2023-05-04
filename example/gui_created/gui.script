@@ -21,5 +21,5 @@ function init(self)
 
 	-- Now we send a message to the gui script, telling it our initial setup is done,
 	-- we also pass in the name here of the texture for ease.
-	msg.post("#gui", "resource_loaded", {texture = name_of_our_new_texture_resource})
+	msg.post("#gui", "resource_loaded", {texture = name_of_our_new_texture_resource, number_of_images = #atlas_entries})
 end
