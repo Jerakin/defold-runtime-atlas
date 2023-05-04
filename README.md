@@ -17,13 +17,37 @@ local rtatlas = require "runtime-atlas.runtime-atlas"
 
 
 local atlas_entries = {
-	"example/assets/images/image0.png", "example/assets/images/image1.png"
+    "example/assets/images/image0.png", "example/assets/images/image1.png"
 }
 
 local atlas_id = rtatlas.pack("example", atlas_entries, 256, 256)
-	
+
 go.set("#sprite", "image", atlas_id)
 sprite.play_flipbook("#sprite", "image0.png")
 ```
 
 The images added will be added with the full file name as the id. This always includes the `.png`.
+
+## API
+
+### rtatlas.pack(atlas_name_or_path, list_of_textures, width, height)
+Packs the provided list_of_textures into an atlas
+
+**PARAMETERS**
+* ```atlas_name_or_path``` (string) - If an path is provided it will load the texture at that path and update image data on it. If a name is provided a new atlas will be created.
+* ```list_of_textures``` (table) - A table of your images, these images needs to be available as resources.
+* ```width``` (number) - The height of your atlas
+* ```height``` (number) - The height of your atlas
+
+
+### rtatlas.algorithm
+Property which is the function that will be used to pack an atlas with. A simplistic rowpacking algorithm is provided as the default
+
+## Packing Algorithm
+If you want to write your own algoritm the signature should be
+### algorithm.pack(list_of_textures, width, height)
+
+**PARAMETERS**
+* ```list_of_textures``` (table) - table of images to pack, each image is represented by a table `{name, w, h}` you are expected to return an extended version of this table where entries for positions `{x, y}` have been added.
+* ```width``` (number) - The height of your atlas
+* ```height``` (number) - The height of your atlas
