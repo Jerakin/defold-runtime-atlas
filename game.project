@@ -16,5 +16,5 @@ title = defold-runtime-atlas
 custom_resources = /example/assets/images
 
 [library]
-include_dirs = /dynamic-atlas
+include_dirs = /runtime-atlas
 
