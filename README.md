@@ -38,6 +38,8 @@ Packs the provided list_of_textures into an atlas
 * ```list_of_textures``` (table) - A table of your images, these images needs to be available as resources.
 * ```width``` (number) - The height of your atlas
 * ```height``` (number) - The height of your atlas
+* ```options``` (table) - Optional table. 
+    * ```premultiply_alpha``` ( boolean) True if alpha should be premultiplied into the color components. Defaults to false.
 
 
 ### rtatlas.algorithm

@@ -32,31 +32,6 @@ local function convert_string_buffer_to_buffer(blob)
 	return new_buffer
 end
 
--- After loading the images they are flipped vertically. This makes sure they are not upside down.
--- TODO: Maybe we can flip the texture as we are converting the buffer
-local function flip_texture_vertically(buffer_string, outw, outh, bytes_per_pixel)
-	local pixels = {}
-	buffer_string:gsub(".",function(c) table.insert(pixels,c) end)
-	local byte1
-	local byte2
-	local offset1
-	local offset2
-	for yi=1, outh / 2 do
-		for xi=1, outw do 
-			offset1 = (xi + (yi * outw)) * bytes_per_pixel;
-			offset2 = (xi + ((outh - 1 - yi) * outw)) * bytes_per_pixel;
-			for bi=0, bytes_per_pixel do
-				byte1 = pixels[offset1 + bi];
-				byte2 = pixels[offset2 + bi];
-				pixels[offset1 + bi] = byte2;
-				pixels[offset2 + bi] = byte1;
-			end
-		end
-	end
-	return table.concat(pixels, "")
-end
-
-
 -- String end_swith
 local function ends_with(str, ending)
 	return ending == "" or str:sub(-#ending) == ending
@@ -84,7 +59,7 @@ end
 
 -- Loads all images into memory and saves some additional data needed for packing.
 -- We need to load the images to get the width and height of them, for our packing algorithm.
-local function get_package_data(list_of_textures)
+local function get_package_data(list_of_textures, options)
 	local pack_data = {}
 	for i in pairs(list_of_textures or {}) do
 		local image_path = list_of_textures[i]
@@ -92,9 +67,8 @@ local function get_package_data(list_of_textures)
 		if file then
 			local buffer = file:read("*all")
 			file:close()
-			local img = image.load(buffer)
-			local buffer = flip_texture_vertically(img.buffer, img.width, img.height, 4)
-			table.insert(pack_data, {name=get_filename(image_path), buffer=convert_string_buffer_to_buffer(buffer), w=img.width, h=img.height})
+			local img = image.load(buffer, {flip_vertically=true, premultiply_alpha=options.premultiply_alpha or false})
+			table.insert(pack_data, {name=get_filename(image_path), buffer=convert_string_buffer_to_buffer(img.buffer), w=img.width, h=img.height})
 		end
 	end
 	return pack_data
@@ -163,8 +137,9 @@ end
 -- @param list_of_textures Table image paths
 -- @param width Atlas width
 -- @param height Atlas height
-function M.pack(atlas_name_or_path, list_of_textures, width, height)
-	local pack_data = get_package_data(list_of_textures)
+-- @param options table containing if you want to **premultiply_alpha** (Defaults to false).
+function M.pack(atlas_name_or_path, list_of_textures, width, height, options)
+	local pack_data = get_package_data(list_of_textures, options or {})
 	local e = M.algorithm(pack_data, width, height)
 	if e == nil then
 		print("ERROR!")
