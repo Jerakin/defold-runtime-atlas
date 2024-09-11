@@ -18,3 +18,9 @@ custom_resources = /example/assets/images
 [library]
 include_dirs = /runtime-atlas
 
+[render]
+clear_color_red = 0.5
+clear_color_green = 0.5
+clear_color_blue = 0.5
+clear_color_alpha = 1.0
+
